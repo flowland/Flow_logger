@@ -40,12 +40,5 @@ public class LogEntry {
 	public void setStop(int stop) {
 		this.stop = stop;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
