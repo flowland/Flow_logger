@@ -26,8 +26,8 @@ import javafx.scene.layout.StackPane;
 public class Main extends Application {
 
 	TableView<LogEntry> logTable;
-	String[] PrefArray = new String[2];
-	ArrayList<UserData> UserInfo = new ArrayList<UserData>();
+	UserData[] PrefArray = new UserData[1];
+	ArrayList<LogEntry> UserInfo = new ArrayList<LogEntry>();
 	TextField newDate, newStart, newStop, newGoal, nameInput, regnrInput;
 	Label name, regnr;
 
@@ -38,20 +38,16 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			TableColumn<LogEntry, String> dateColumn = new TableColumn<>("Kuupäev"); // kuupäeva
-																						// column
+			TableColumn<LogEntry, String> dateColumn = new TableColumn<>("Kuupäev"); // kuupäeva column
 			dateColumn.setMinWidth(100);
 			dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-			TableColumn<LogEntry, Integer> startColumn = new TableColumn<>("Algnäit"); // algnäidu
-																						// column
+			TableColumn<LogEntry, Integer> startColumn = new TableColumn<>("Algnäit"); // algnäidu // colum																			
 			startColumn.setMinWidth(120);
 			startColumn.setCellValueFactory(new PropertyValueFactory<>("start"));
-			TableColumn<LogEntry, Integer> stopColumn = new TableColumn<>("Lõppnäit"); // lõppnäidu
-																						// column
+			TableColumn<LogEntry, Integer> stopColumn = new TableColumn<>("Lõppnäit"); // lõppnäidu// column
 			stopColumn.setMinWidth(120);
 			stopColumn.setCellValueFactory(new PropertyValueFactory<>("stop"));
-			TableColumn<LogEntry, String> goalColumn = new TableColumn<>("Eesmärk"); // eesmärgi
-																						// column
+			TableColumn<LogEntry, String> goalColumn = new TableColumn<>("Eesmärk"); // eesmärgi // column																			
 			goalColumn.setMinWidth(120);
 			goalColumn.setCellValueFactory(new PropertyValueFactory<>("goal"));
 
@@ -90,14 +86,13 @@ public class Main extends Application {
 		grid.setConstraints(regnr, 1, 0);
 		regnrInput = new TextField();
 		grid.setConstraints(regnrInput, 1, 1);
-		
+
 		Button recButton = new Button("Salvesta "); // nupp kasutaja andmete
 													// salvestamiseks
 		recButton.setOnAction(e -> {
 			recButton();
 			nameInput.setEditable(false);
 			regnrInput.setEditable(false);
-			
 		});
 		grid.setConstraints(recButton, 2, 1);
 		grid.getChildren().addAll(name, nameInput, regnr, regnrInput, recButton);
@@ -110,19 +105,7 @@ public class Main extends Application {
 		String input = nameInput.getText();
 		String regn = regnrInput.getText();
 		UserData user = new UserData(input, regn);
-		
-		UserPrefs prefs = new UserPrefs();
-		try {
-			PrefArray = prefs.setPreference(user);
-		} catch (BackingStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// UserInfo.add(user);
-		// PrefArray.add(input);
-		// PrefArray.add(regn);
-		// this.PrefArray = PrefArray;
-		// return PrefArray;
+		PrefArray[0] = user;
 	}
 
 	public HBox makeHBox() {
@@ -162,6 +145,7 @@ public class Main extends Application {
 		newEntry.setStart(Integer.parseInt(newStart.getText()));
 		newEntry.setStop(Integer.parseInt(newStop.getText()));
 		newEntry.setGoal(newGoal.getText());
+		UserInfo.add(newEntry);
 		logTable.getItems().add(newEntry);
 		newDate.clear();
 		newStart.clear();
@@ -178,21 +162,7 @@ public class Main extends Application {
 
 	public ObservableList<LogEntry> allEntries() {
 		ObservableList<LogEntry> entries = FXCollections.observableArrayList();
-		entries.add(new LogEntry("01.01.2000", "Sõidu eesmärk", 000000000, 000000000));
+		entries.add(new LogEntry("1.1.2000", "Sõidu eesmärk", 0, 0));
 		return entries;
 	}
-	/**
-	 * Returns the person file preference, i.e. the file that was last opened.
-	 * The preference is read from the OS specific registry. If no such
-	 * preference can be found, null is returned.
-	 * 
-	 * @return
-	 */
-	/*
-	 * public String getUserPrefs() { Preferences prefs =
-	 * Preferences.userRoot().node(this.getClass().getName()); String userName =
-	 * UserData.get(0); String regNr = UserData.get(1);
-	 * System.out.println(prefs.get(userName, "Hello World")); }
-	 */
-
 }
