@@ -1,4 +1,4 @@
-package application;
+package model;
 
 public class LogEntry {
 	private String date, goal;

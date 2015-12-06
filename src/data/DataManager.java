@@ -1,6 +1,8 @@
-package application;
+package data;
 
 import java.util.ArrayList;
+
+import model.LogEntry;
 
 public class DataManager {
 	private ArrayList<LogEntry> logentries;
