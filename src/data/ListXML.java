@@ -6,9 +6,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import model.LogEntry;
 
 @XmlRootElement(name = "entries")
-public class ListWrapper {
+public class ListXML {
 	private List<LogEntry> entries;
-
+	
 	@XmlElement(name = "entry")
 	public List<LogEntry> getEntries() {
 		return entries;

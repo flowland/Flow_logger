@@ -12,7 +12,7 @@ public class HBoxes {
 	TextField newDate, newStart, newStop, newGoal;
 	HBox hbox;
 	
-	public void makeHBox() {
+	public HBox makeHBox() {
 		hbox = new HBox();
 		hbox.setPadding(new Insets(15, 15, 50, 15));
 		hbox.setFillHeight(true);
@@ -40,9 +40,10 @@ public class HBoxes {
 			mainApp.deleteEntryClick();
 		});
 		hbox.getChildren().addAll(newDate, newStart, newStop, newGoal, addEntry, deleteEntry);
+		return hbox;
 	}
 	public HBox getHBox() {
-		makeHBox();
-		return hbox;
+		HBoxes hbox = new HBoxes();
+		return hbox.makeHBox();
 	}
 }

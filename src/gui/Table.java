@@ -8,32 +8,30 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import model.LogEntry;
 
 public class Table {
+	
 	private TableView<LogEntry> logTable;
-
+	
 	public void makeTable() {
 		logTable = new TableView<>();
+		
 		// Create columns
 		TableColumn<LogEntry, String> dateColumn = new TableColumn<>("Kuupäev");
 		dateColumn.setMinWidth(100);
+		dateColumn.prefWidthProperty().bind(logTable.widthProperty().divide(4));
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 		TableColumn<LogEntry, Integer> startColumn = new TableColumn<>("Algnäit");
 		startColumn.setMinWidth(120);
+		startColumn.prefWidthProperty().bind(logTable.widthProperty().divide(4));
 		startColumn.setCellValueFactory(new PropertyValueFactory<>("start"));
 		TableColumn<LogEntry, Integer> stopColumn = new TableColumn<>("Lõppnäit");
 		stopColumn.setCellValueFactory(new PropertyValueFactory<>("stop"));
+		stopColumn.prefWidthProperty().bind(logTable.widthProperty().divide(4));
 		TableColumn<LogEntry, String> goalColumn = new TableColumn<>("Eesmärk");
 		goalColumn.setCellValueFactory(new PropertyValueFactory<>("goal"));
-		// create Table and 
-		//logTable.setItems(allEntries());
+		goalColumn.prefWidthProperty().bind(logTable.widthProperty().divide(3));
 		logTable.getColumns().addAll(dateColumn, startColumn, stopColumn, goalColumn);
-
 	}
-	public ObservableList<LogEntry> allEntries() {
-		ObservableList<LogEntry> entries = FXCollections.observableArrayList();
-		entries.add(new LogEntry("1.1.2000", "Sõidu eesmärk", 0, 0));
-		return entries;
-	}  
-
+	
 	public TableView<LogEntry> getLogTable() {
 		makeTable();
 		return logTable;
