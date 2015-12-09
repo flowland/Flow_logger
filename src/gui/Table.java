@@ -12,8 +12,8 @@ public class Table {
 	private TableView<LogEntry> logTable;
 	
 	public void makeTable() {
-		logTable = new TableView<>();
 		
+		logTable = new TableView<>();
 		// Create columns
 		TableColumn<LogEntry, String> dateColumn = new TableColumn<>("Kuupäev");
 		dateColumn.setMinWidth(100);
@@ -29,6 +29,7 @@ public class Table {
 		TableColumn<LogEntry, String> goalColumn = new TableColumn<>("Eesmärk");
 		goalColumn.setCellValueFactory(new PropertyValueFactory<>("goal"));
 		goalColumn.prefWidthProperty().bind(logTable.widthProperty().divide(3));
+		//add columns
 		logTable.getColumns().addAll(dateColumn, startColumn, stopColumn, goalColumn);
 	}
 	

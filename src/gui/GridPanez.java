@@ -25,7 +25,6 @@ public class GridPanez {
 		grid.setConstraints(regnrInput, 1, 1);
 		Button recButton = new Button("Salvesta ");
 		recButton.setOnAction(e -> {
-			//recButton();
 			nameInput.setEditable(false);
 			regnrInput.setEditable(false);
 		});

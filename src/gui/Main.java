@@ -1,8 +1,6 @@
 package gui;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -14,42 +12,60 @@ import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.LogEntry;
-import model.UserData;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import gui.Table;
 
 public class Main extends Application {
-
-	// TableView<LogEntry> logTable;
-	// UserData[] PrefArray = new UserData[1];
+	
+	File cssfile = new File("JMetroLightTheme.css");
 	ObservableList<LogEntry> userInfo = FXCollections.observableArrayList();
 	TextField newDate, newStart, newStop, newGoal, nameInput, regnrInput;
+	Button addEntry, deleteEntry;
 	Label name, regnr;
 	Table table = new Table();
 	TableView<LogEntry> entryTable = table.getLogTable();
 	GridPanez gridPane = new GridPanez();
 	Stage window;
-
+	boolean isEmpty = false;
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) {
+		
+		VBox menuBox = new VBox();
+		menuBox.getChildren().addAll(topMenuBar(), gridPane.getGridPane());
+		VBox bottomBox = new VBox();
+		bottomBox.getChildren().addAll(makeHBox(), buttonBox());
+		// the main layout
+		BorderPane mainPane = new BorderPane();
+		mainPane.setTop(menuBox);
+		mainPane.setCenter(entryTable);
+		mainPane.setBottom(bottomBox);
+		Scene scene = new Scene(mainPane, 600, 400);
+		scene.getStylesheets().clear();
+		scene.getStylesheets().add("file:///" + cssfile.getAbsolutePath().replace("\\", "/"));
+		Stage window = primaryStage;
+		window.setTitle("Drivelogger D99");
+		window.setScene(scene);
+		window.show();
+	}
+	// Makes the File menu
+	public MenuBar topMenuBar() {
 		// the menu
 		Menu fileMenu = new Menu("File");
 		// menu items
 		MenuItem fileLoad = new MenuItem("Load");
 		fileLoad.setOnAction(e -> loadLog());
-		MenuItem fileSave = new MenuItem("Save");
-		fileSave.setOnAction(e -> handleSaveAs());
+		MenuItem fileSave = new MenuItem("Save As");
+		fileSave.setOnAction(e -> saveLogAs());
 		MenuItem exit = new MenuItem("Exit");
 		exit.setOnAction(e -> System.exit(0));
 		fileMenu.getItems().add(fileLoad);
@@ -58,113 +74,101 @@ public class Main extends Application {
 		// actual menubar
 		MenuBar newBar = new MenuBar();
 		newBar.getMenus().addAll(fileMenu);
-		VBox menuBox = new VBox();
-		menuBox.getChildren().addAll(newBar, gridPane.getGridPane());
-		VBox bottomBox = new VBox();
-		bottomBox.getChildren().addAll(makeHBox(), buttonBox());
-
-		BorderPane mainPane = new BorderPane(); // main layout
-		mainPane.setTop(menuBox);
-		mainPane.setCenter(entryTable);
-		mainPane.setBottom(bottomBox);
-
-		Scene scene = new Scene(mainPane, 600, 400); // setting the scene
-		Stage window = primaryStage;
-		window.setTitle("Drivelogger D99");
-		window.setScene(scene);
-		window.show();
+		return newBar;
 	}
-
-	/*
-	 * public GridPane makePane() { GridPane grid = new GridPane();
-	 * grid.setPadding(new Insets(15, 15, 15, 15)); grid.setVgap(8);
-	 * grid.setHgap(10); name = new Label("Kasutaja nimi: ");
-	 * grid.setConstraints(name, 0, 0); nameInput = new TextField();
-	 * grid.setConstraints(nameInput, 0, 1); regnr = new Label("Auto reg. nr: "
-	 * ); grid.setConstraints(regnr, 1, 0); regnrInput = new TextField();
-	 * grid.setConstraints(regnrInput, 1, 1); Button recButton = new Button(
-	 * "Salvesta "); recButton.setOnAction(e -> { recButton();
-	 * nameInput.setEditable(false); regnrInput.setEditable(false); });
-	 * grid.setConstraints(recButton, 2, 1); grid.getChildren().addAll(name,
-	 * nameInput, regnr, regnrInput, recButton); return grid; }
-	 * 
-	 * // method for "Salvesta" button click public void recButton() { //
-	 * ArrayList<String> PrefArray = new ArrayList<String>(); String input =
-	 * nameInput.getText(); String regn = regnrInput.getText(); UserData user =
-	 * new UserData(input, regn); //PrefArray[0] = user; }
-	 */
-
+	// makes the HBox for the new entry textfields
 	public HBox makeHBox() {
 		HBox hbox = new HBox();
-		hbox.setPadding(new Insets(15, 15, 50, 15));
+		hbox.setPadding(new Insets(15, 15, 15, 15));
 		hbox.setFillHeight(true);
 		hbox.setSpacing(8);
-		newDate = new TextField(); // uue sissekande: kuupäev
+		newDate = new TextField();
 		newDate.setPromptText("Kuupäev");
 		newDate.setMinWidth(90);
-		newStart = new TextField(); // uue sissekande: algnäit
+		hbox.setHgrow(newDate, Priority.ALWAYS);
+		newStart = new TextField();
 		newStart.setPromptText("Algnäit");
 		newStart.setMinWidth(100);
-		newStop = new TextField(); // uue sissekande: lõppnäit
+		hbox.setHgrow(newStart, Priority.ALWAYS);
+		newStop = new TextField();
 		newStop.setPromptText("Lõppnäit");
 		newStop.setMinWidth(100);
-		newGoal = new TextField(); // uue sissekande: eesmärk
+		hbox.setHgrow(newStop, Priority.ALWAYS);
+		newGoal = new TextField();
 		newGoal.setPromptText("Eesmärk");
 		newGoal.setMinWidth(100);
-		newGoal.setMaxWidth(100);
-		// sissekande tgemise nupp
-		/*Button addEntry = new Button("Sisesta");
-		addEntry.setOnAction(e -> {
-			addEntryClick();
-		});
-		Button deleteEntry = new Button("Kustuta");
-		deleteEntry.setOnAction(e -> {
-			deleteEntryClick();
-		}); */
+		hbox.setHgrow(newGoal, Priority.ALWAYS);
 		hbox.getChildren().addAll(newDate, newStart, newStop, newGoal);
 		return hbox;
 	}
+	// Add and delete button for new log entry
 	public HBox buttonBox() {
 		HBox buttons = new HBox(8);
-		buttons.setPadding(new Insets(15, 15, 15, 15));
+		buttons.setPadding(new Insets(5, 5, 20, 5));
 		buttons.setAlignment(Pos.CENTER);
-		Button addEntry = new Button("Sisesta");
-		addEntry.setOnAction(e -> {
-			addEntryClick();
-		});
-		Button deleteEntry = new Button("Kustuta");
-		deleteEntry.setOnAction(e -> {
-			deleteEntryClick();
-		});
+		addEntry = new Button("Sisesta");
+		addEntry.setOnAction(e -> addEntryClick());
+		deleteEntry = new Button("Kustuta");
+		deleteEntry.setOnAction(e -> deleteEntryClick());
 		buttons.getChildren().addAll(addEntry, deleteEntry);
 		return buttons;
 	}
-
+	// adds the new entry to the table
 	public void addEntryClick() {
 		LogEntry newEntry = new LogEntry();
-		newEntry.setDate(newDate.getText());
-		newEntry.setStart(Integer.parseInt(newStart.getText()));
-		newEntry.setStop(Integer.parseInt(newStop.getText()));
-		newEntry.setGoal(newGoal.getText());
+		if(newDate.getText().trim().equals("")) {
+			;
+		} else if(intCheck(newStart) && intCheck(newStop)) {
+			newEntry.setDate(newDate.getText());
+			newEntry.setStart(Integer.parseInt(newStart.getText()));
+			newEntry.setStop(Integer.parseInt(newStop.getText()));
+			newEntry.setGoal(newGoal.getText());
 		// adds entry to arraylist
-		userInfo.add(newEntry);
+			userInfo.add(newEntry);
 		// adds it to the tableview
-		entryTable.getItems().add(newEntry);
+			entryTable.getItems().add(newEntry);
 		// clears the text input areas
-		newDate.clear();
-		newStart.clear();
-		newStop.clear();
-		newGoal.clear();
+			newDate.clear();
+			newStart.clear();
+			newStop.clear();
+			newGoal.clear();
+			} else {
+			Alert errors = new Alert(AlertType.ERROR);
+			newStart.clear();
+			newStop.clear();
+			errors.initOwner(window);
+			errors.setTitle("Viga sisestamisel");
+			errors.setHeaderText("Palun kontrollige, et mõni tekstiväli ei ole tühi/ei sisalda arvu asemel tähti.");
+			errors.show();
+			}
 	}
-
+	// checks some of textfields for integer-ness
+	public boolean intCheck(TextField field) {
+		try {
+			int start = Integer.parseInt(field.getText());
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	// delets an entry from the list
 	public void deleteEntryClick() {
-		ObservableList<LogEntry> entrySelected, allEntries;
-		allEntries = entryTable.getItems();
-		entrySelected = entryTable.getSelectionModel().getSelectedItems();
-		entrySelected.forEach(allEntries::remove);
+
+		DeleteAlert alert = new DeleteAlert();
+		int index = entryTable.getSelectionModel().getSelectedIndex();
+		if (index < 0) {
+			Alert redAlert = new Alert(AlertType.ERROR);
+			redAlert.initOwner(window);
+			redAlert.setTitle("Errorz");
+			redAlert.setContentText("Ühtegi kirjet pole valitud");
+			redAlert.showAndWait();
+		} else if (alert.showDeleteConfirmation() == true) {
+			entryTable.getItems().remove(index);
+		}
 	}
 
 	public File getPath() {
+
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		String path = prefs.get("filePath", null);
 		if (path != null) {
@@ -173,15 +177,13 @@ public class Main extends Application {
 			return null;
 		}
 	}
-
 	/**
-	 * Sets the file path of the currently loaded file. The path is persisted in
-	 * the OS specific registry.
+	 * Sets the file path of the loaded file.
 	 * 
 	 * @param file
-	 *            the file or null to remove the path
 	 */
 	public void setPath(File file) {
+
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		if (file != null) {
 			prefs.put("filePath", file.getPath());
@@ -192,6 +194,9 @@ public class Main extends Application {
 			// Update the stage title.
 			window.setTitle("Sõidupäevik");
 		}
+	}
+	public void setUserData(String user, String regnr) {
+		
 	}
 
 	public void saveEntryData(File file) {
@@ -228,6 +233,7 @@ public class Main extends Application {
 	}
 
 	public void loadLog() {
+
 		FileChooser pickOne = new FileChooser();
 		// set filter
 		FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("XML files", "*.xml");
@@ -239,12 +245,14 @@ public class Main extends Application {
 		}
 	}
 
-	public void handleSaveAs() {
+	public void saveLogAs() {
+
 		FileChooser fileChooser = new FileChooser();
 		// Set extension filter
-		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		FileChooser.ExtensionFilter extFilter = new
+		FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
 		fileChooser.getExtensionFilters().add(extFilter);
-		// Show save file dialog
+		//Show save file dialog
 		File file = fileChooser.showSaveDialog(window);
 		if (file != null) {
 			// Make sure it has the correct extension
@@ -254,10 +262,4 @@ public class Main extends Application {
 			saveEntryData(file);
 		}
 	}
-
-	/*
-	 * public ObservableList<LogEntry> allEntries() { ObservableList<LogEntry>
-	 * entries = FXCollections.observableArrayList(); entries.add(new
-	 * LogEntry("1.1.2000", "Sõidu eesmärk", 0, 0)); return entries; }
-	 */
 }

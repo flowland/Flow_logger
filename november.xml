@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<entries>
+    <entry>
+        <date>12.11.2015</date>
+        <goal>Tartusse sõit</goal>
+        <start>150125</start>
+        <stop>150250</stop>
+    </entry>
+    <entry>
+        <date>13.11.2015</date>
+        <goal>Amigosse keikka</goal>
+        <start>150250</start>
+        <stop>150400</stop>
+    </entry>
+    <entry>
+        <date>16.11.2015</date>
+        <goal>Rõuges esinemine</goal>
+        <start>150400</start>
+        <stop>150900</stop>
+    </entry>
+</entries>

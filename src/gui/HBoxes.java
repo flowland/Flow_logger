@@ -1,6 +1,7 @@
 package gui;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -10,10 +11,12 @@ public class HBoxes {
 	
 	Main mainApp = new Main();
 	TextField newDate, newStart, newStop, newGoal;
-	HBox hbox;
-	
+	public HBoxes() {
+		this.makeButtonBox();
+		this.makeHBox();
+	}
 	public HBox makeHBox() {
-		hbox = new HBox();
+		HBox hbox = new HBox();
 		hbox.setPadding(new Insets(15, 15, 50, 15));
 		hbox.setFillHeight(true);
 		hbox.setSpacing(8);
@@ -30,7 +33,13 @@ public class HBoxes {
 		newGoal.setPromptText("Eesmärk");
 		newGoal.setMinWidth(100);
 		newGoal.setMaxWidth(100);
-		// sissekande tgemise nupp
+		hbox.getChildren().addAll(newDate, newStart, newStop, newGoal);
+		return hbox;
+	}
+	public HBox makeButtonBox() {
+		HBox buttons = new HBox(8);
+		buttons.setPadding(new Insets(5, 5, 5, 5));
+		buttons.setAlignment(Pos.CENTER);
 		Button addEntry = new Button("Sisesta");
 		addEntry.setOnAction(e -> {
 			mainApp.addEntryClick();
@@ -39,11 +48,13 @@ public class HBoxes {
 		deleteEntry.setOnAction(e -> {
 			mainApp.deleteEntryClick();
 		});
-		hbox.getChildren().addAll(newDate, newStart, newStop, newGoal, addEntry, deleteEntry);
-		return hbox;
+		buttons.getChildren().addAll(addEntry, deleteEntry);
+		return buttons;
 	}
 	public HBox getHBox() {
-		HBoxes hbox = new HBoxes();
-		return hbox.makeHBox();
+		return makeHBox();
+	}
+	public HBox getButtonBox() {
+		return makeButtonBox();
 	}
 }
