@@ -21,7 +21,7 @@ import javafx.scene.layout.*;
 import gui.Table;
 
 public class Main extends Application {
-	
+
 	File cssfile = new File("JMetroLightTheme.css");
 	ObservableList<LogEntry> userInfo = FXCollections.observableArrayList();
 	TextField newDate, newStart, newStop, newGoal, nameInput, regnrInput;
@@ -31,15 +31,13 @@ public class Main extends Application {
 	TableView<LogEntry> entryTable = table.getLogTable();
 	GridPanez gridPane = new GridPanez();
 	Stage window;
-	boolean isEmpty = false;
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) {
-		
 		VBox menuBox = new VBox();
 		menuBox.getChildren().addAll(topMenuBar(), gridPane.getGridPane());
 		VBox bottomBox = new VBox();
@@ -49,7 +47,7 @@ public class Main extends Application {
 		mainPane.setTop(menuBox);
 		mainPane.setCenter(entryTable);
 		mainPane.setBottom(bottomBox);
-		Scene scene = new Scene(mainPane, 600, 400);
+		Scene scene = new Scene(mainPane, 700, 500);
 		scene.getStylesheets().clear();
 		scene.getStylesheets().add("file:///" + cssfile.getAbsolutePath().replace("\\", "/"));
 		Stage window = primaryStage;
@@ -57,6 +55,7 @@ public class Main extends Application {
 		window.setScene(scene);
 		window.show();
 	}
+
 	// Makes the File menu
 	public MenuBar topMenuBar() {
 		// the menu
@@ -64,18 +63,22 @@ public class Main extends Application {
 		// menu items
 		MenuItem fileLoad = new MenuItem("Load");
 		fileLoad.setOnAction(e -> loadLog());
-		MenuItem fileSave = new MenuItem("Save As");
-		fileSave.setOnAction(e -> saveLogAs());
+		MenuItem fileSave = new MenuItem("Save");
+		fileSave.setOnAction(e -> saveLog());
+		MenuItem fileSaveAs = new MenuItem("Save As");
+		fileSaveAs.setOnAction(e -> saveLogAs());
 		MenuItem exit = new MenuItem("Exit");
 		exit.setOnAction(e -> System.exit(0));
 		fileMenu.getItems().add(fileLoad);
 		fileMenu.getItems().add(fileSave);
+		fileMenu.getItems().add(fileSaveAs);
 		fileMenu.getItems().add(exit);
 		// actual menubar
 		MenuBar newBar = new MenuBar();
 		newBar.getMenus().addAll(fileMenu);
 		return newBar;
 	}
+
 	// makes the HBox for the new entry textfields
 	public HBox makeHBox() {
 		HBox hbox = new HBox();
@@ -101,6 +104,7 @@ public class Main extends Application {
 		hbox.getChildren().addAll(newDate, newStart, newStop, newGoal);
 		return hbox;
 	}
+
 	// Add and delete button for new log entry
 	public HBox buttonBox() {
 		HBox buttons = new HBox(8);
@@ -113,36 +117,38 @@ public class Main extends Application {
 		buttons.getChildren().addAll(addEntry, deleteEntry);
 		return buttons;
 	}
-	// adds the new entry to the table
+
+	// adds the new entry to the table after doing some data validation
 	public void addEntryClick() {
 		LogEntry newEntry = new LogEntry();
-		if(newDate.getText().trim().equals("")) {
+		if (newDate.getText().trim().equals("")) {
 			;
-		} else if(intCheck(newStart) && intCheck(newStop)) {
+		} else if (intCheck(newStart) && intCheck(newStop)) {
 			newEntry.setDate(newDate.getText());
 			newEntry.setStart(Integer.parseInt(newStart.getText()));
 			newEntry.setStop(Integer.parseInt(newStop.getText()));
 			newEntry.setGoal(newGoal.getText());
-		// adds entry to arraylist
+			// adds entry to arraylist
 			userInfo.add(newEntry);
-		// adds it to the tableview
+			// adds it to the tableview
 			entryTable.getItems().add(newEntry);
-		// clears the text input areas
+			// clears the text input areas
 			newDate.clear();
 			newStart.clear();
 			newStop.clear();
 			newGoal.clear();
-			} else {
+		} else {
 			Alert errors = new Alert(AlertType.ERROR);
 			newStart.clear();
 			newStop.clear();
 			errors.initOwner(window);
 			errors.setTitle("Viga sisestamisel");
-			errors.setHeaderText("Palun kontrollige, et mõni tekstiväli ei ole tühi/ei sisalda arvu asemel tähti.");
+			errors.setHeaderText("Alg- ja lõppnäidu väljad peavad sisaldama ainult (täis)arve!");
 			errors.show();
-			}
+		}
 	}
-	// checks some of textfields for integer-ness
+
+	// checks a textfield for integer-ness
 	public boolean intCheck(TextField field) {
 		try {
 			int start = Integer.parseInt(field.getText());
@@ -151,15 +157,16 @@ public class Main extends Application {
 			return false;
 		}
 	}
-	// delets an entry from the list
-	public void deleteEntryClick() {
 
+	// deletes an entry from the list
+	public void deleteEntryClick() {
 		DeleteAlert alert = new DeleteAlert();
 		int index = entryTable.getSelectionModel().getSelectedIndex();
 		if (index < 0) {
 			Alert redAlert = new Alert(AlertType.ERROR);
 			redAlert.initOwner(window);
-			redAlert.setTitle("Errorz");
+			redAlert.setTitle("Palun tähelepanu!");
+			redAlert.setHeaderText("Väike probleem...");
 			redAlert.setContentText("Ühtegi kirjet pole valitud");
 			redAlert.showAndWait();
 		} else if (alert.showDeleteConfirmation() == true) {
@@ -167,8 +174,8 @@ public class Main extends Application {
 		}
 	}
 
+	// Returns the file that was last opened or null if it is not found
 	public File getPath() {
-
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		String path = prefs.get("filePath", null);
 		if (path != null) {
@@ -177,39 +184,28 @@ public class Main extends Application {
 			return null;
 		}
 	}
-	/**
-	 * Sets the file path of the loaded file.
-	 * 
-	 * @param file
-	 */
-	public void setPath(File file) {
 
+	// Sets the file path of the currently loaded file.
+	public void setPath(File file) {
 		Preferences prefs = Preferences.userNodeForPackage(Main.class);
 		if (file != null) {
 			prefs.put("filePath", file.getPath());
-			// Update the stage title.
-			window.setTitle("Sõidupäevik: " + file.getName());
 		} else {
 			prefs.remove("filePath");
-			// Update the stage title.
-			window.setTitle("Sõidupäevik");
 		}
 	}
-	public void setUserData(String user, String regnr) {
-		
-	}
 
+	// save list into file(save as)
 	public void saveEntryData(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(ListXML.class);
-			Marshaller marsh = context.createMarshaller();
-			marsh.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			// wrapping the list
+			Marshaller m = context.createMarshaller();
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			ListXML tempList = new ListXML();
 			tempList.setEntries(userInfo);
 			// marshal and save to file
-			marsh.marshal(tempList, file);
-			// save the path to registry;
+			m.marshal(tempList, file);
+			// save the file path to registry;
 			setPath(file);
 		} catch (Exception e) {
 
@@ -220,20 +216,22 @@ public class Main extends Application {
 	public void loadEntryData(File file) {
 		try {
 			JAXBContext context = JAXBContext.newInstance(ListXML.class);
-			Unmarshaller unm = context.createUnmarshaller();
+			Unmarshaller unM = context.createUnmarshaller();
 			// reading xml from file and unmarshalling into list
-			ListXML tempList = (ListXML) unm.unmarshal(file);
-			// clears table and then adds the entries
+			ListXML tempList = (ListXML) unM.unmarshal(file);
+			// clears table and then adds the entries to the table
 			entryTable.getItems().clear();
 			entryTable.getItems().addAll(tempList.getEntries());
+			// adds all the entries to the list
+			userInfo.addAll(tempList.getEntries());
 			setPath(file);
 		} catch (Exception e) {
 
 		}
 	}
 
+	// opens filechooser to pick a file and feeds it to the loadEntryData method
 	public void loadLog() {
-
 		FileChooser pickOne = new FileChooser();
 		// set filter
 		FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("XML files", "*.xml");
@@ -244,15 +242,22 @@ public class Main extends Application {
 			loadEntryData(file);
 		}
 	}
-
+	// gets the opened filepath and saves it, if it doesn't exist - save as with filechooser
+	public void saveLog() {
+        File file = getPath();
+        if (file != null) {
+            saveEntryData(file);
+        } else {
+            saveLogAs();
+        }
+    }
+	// opens filechooser and creates file to go into saveEntryData method
 	public void saveLogAs() {
-
 		FileChooser fileChooser = new FileChooser();
 		// Set extension filter
-		FileChooser.ExtensionFilter extFilter = new
-		FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
 		fileChooser.getExtensionFilters().add(extFilter);
-		//Show save file dialog
+		// Show save file dialog
 		File file = fileChooser.showSaveDialog(window);
 		if (file != null) {
 			// Make sure it has the correct extension

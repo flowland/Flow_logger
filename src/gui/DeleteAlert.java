@@ -13,18 +13,15 @@ public class DeleteAlert {
 	Button okButton, cancelButton;
 	boolean areuOk = false;
 	Stage confirmStage;
-	
+
 	public boolean showDeleteConfirmation() {
-		
 		confirmStage = new Stage();
 		confirmStage.setTitle("Kustuta kirje?");
 		confirmStage.initModality(Modality.APPLICATION_MODAL);
 		okButton = new Button("OK");
-		okButton.setOnAction(e -> 
-			okClicked());
+		okButton.setOnAction(e -> okClicked());
 		cancelButton = new Button("Pigem ei!");
-		cancelButton.setOnAction(e -> 
-			cancelClicked());
+		cancelButton.setOnAction(e -> cancelClicked());
 		Label warningLabel = new Label();
 		warningLabel.setText("Oled kindel, et tahad kirje kustutada?");
 		VBox alert = new VBox(20);
@@ -38,11 +35,13 @@ public class DeleteAlert {
 		confirmStage.showAndWait();
 		return areuOk;
 	}
+
 	public boolean okClicked() {
 		areuOk = true;
 		confirmStage.close();
 		return areuOk;
 	}
+
 	public boolean cancelClicked() {
 		areuOk = false;
 		confirmStage.close();
