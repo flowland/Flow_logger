@@ -3,8 +3,6 @@ package data;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import javafx.collections.ObservableList;
 import model.LogEntry;
 
 @XmlRootElement(name = "entries")

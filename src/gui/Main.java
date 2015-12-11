@@ -17,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import gui.Table;
 
@@ -38,8 +39,10 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		// top bar
 		VBox menuBox = new VBox();
 		menuBox.getChildren().addAll(topMenuBar(), gridPane.getGridPane());
+		// bottom bar
 		VBox bottomBox = new VBox();
 		bottomBox.getChildren().addAll(makeHBox(), buttonBox());
 		// the main layout
@@ -48,17 +51,18 @@ public class Main extends Application {
 		mainPane.setCenter(entryTable);
 		mainPane.setBottom(bottomBox);
 		Scene scene = new Scene(mainPane, 700, 500);
+		// css stylin
 		scene.getStylesheets().clear();
-		scene.getStylesheets().add("file:///" + cssfile.getAbsolutePath().replace("\\", "/"));
-		Stage window = primaryStage;
+		scene.getStylesheets().add("file:///" + cssfile.getAbsolutePath());
+		window = primaryStage;
 		window.setTitle("Drivelogger D99");
 		window.setScene(scene);
 		window.show();
+		window.getIcons().add(new Image("file:icons/car.png"));
 	}
 
-	// Makes the File menu
+	// Makes the menubar with a "File" menu
 	public MenuBar topMenuBar() {
-		// the menu
 		Menu fileMenu = new Menu("File");
 		// menu items
 		MenuItem fileLoad = new MenuItem("Load");
@@ -158,7 +162,7 @@ public class Main extends Application {
 		}
 	}
 
-	// deletes an entry from the list
+	// method for deleting an entry from the list
 	public void deleteEntryClick() {
 		DeleteAlert alert = new DeleteAlert();
 		int index = entryTable.getSelectionModel().getSelectedIndex();
@@ -242,15 +246,17 @@ public class Main extends Application {
 			loadEntryData(file);
 		}
 	}
+
 	// gets the opened filepath and saves it, if it doesn't exist - save as with filechooser
 	public void saveLog() {
-        File file = getPath();
-        if (file != null) {
-            saveEntryData(file);
-        } else {
-            saveLogAs();
-        }
-    }
+		File file = getPath();
+		if (file != null) {
+			saveEntryData(file);
+		} else {
+			saveLogAs();
+		}
+	}
+
 	// opens filechooser and creates file to go into saveEntryData method
 	public void saveLogAs() {
 		FileChooser fileChooser = new FileChooser();

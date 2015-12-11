@@ -6,10 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
-
 public class GridPanez {
 	private Label name, regnr;
 	private TextField nameInput, regnrInput;
+	
 	public GridPane makePane() {
 		GridPane grid = new GridPane();
 		grid.setPadding(new Insets(15, 15, 15, 15));
@@ -32,6 +32,7 @@ public class GridPanez {
 		grid.getChildren().addAll(name, nameInput, regnr, regnrInput, recButton);
 		return grid;
 	}
+	
 	public GridPane getGridPane() {
 	return this.makePane();
 	}
